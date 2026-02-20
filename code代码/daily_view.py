@@ -399,8 +399,10 @@ class DailyView:
         start_time_var = tk.StringVar()
         end_time_var = tk.StringVar()
         completed_var = tk.IntVar()
+
         # 新增：是否设置开始时间
         enable_start_time = tk.BooleanVar(value=True)
+        enable_reminder_var = tk.BooleanVar(value=True)  # 默认开启
 
         if event:
             title_var.set(event['title'])
@@ -413,6 +415,8 @@ class DailyView:
             # 如果原事件没有开始时间，则取消勾选
             if not event.get('start_time'):
                 enable_start_time.set(False)
+
+            enable_reminder_var.set(event.get('enable_reminder', 1))  # 默认1
 
         # 表单
         row = 0
@@ -455,11 +459,16 @@ class DailyView:
         ttk.Entry(dialog, textvariable=end_time_var, width=20).grid(row=row, column=1, padx=5, pady=5, sticky="w")
 
         row += 1
+        ttk.Label(dialog, text="启用提醒：").grid(row=row, column=0, padx=5, pady=5, sticky="e")
+        ttk.Checkbutton(dialog, text="时间到达时提醒", variable=enable_reminder_var).grid(row=row, column=1, padx=5,pady=5, sticky="w")
+
+        row += 1
         # 如果有事件，显示完成状态复选框
         if event:
             ttk.Label(dialog, text="已完成：").grid(row=row, column=0, padx=5, pady=5, sticky="e")
             ttk.Checkbutton(dialog, variable=completed_var).grid(row=row, column=1, padx=5, pady=5, sticky="w")
             row += 1
+
 
         # 按钮
         btn_frame = ttk.Frame(dialog)
@@ -517,7 +526,8 @@ class DailyView:
                 'end_time': end_time,
                 'completed': completed_var.get() if event else 0,
                 'is_recurring': 0,  # 暂时保留但未使用
-                'recurring_rule': None
+                'recurring_rule': None,
+                'enable_reminder': 1 if enable_reminder_var.get() else 0
             }
 
             if event:

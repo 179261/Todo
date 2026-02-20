@@ -54,6 +54,18 @@ class Database:
                     UNIQUE(event_id, date)          -- 确保每个事件每天只有一条进度记录
                 )
             ''')
+        self._add_reminder_column()  # 新增
+
+    def _add_reminder_column(self):
+        """为 events 表添加 enable_reminder 列（如果不存在）"""
+        cursor = self.conn.execute("PRAGMA table_info(events)")
+        columns = [col[1] for col in cursor.fetchall()]
+        if 'enable_reminder' not in columns:
+            try:
+                self.conn.execute("ALTER TABLE events ADD COLUMN enable_reminder INTEGER DEFAULT 1")
+                #print("数据库升级：添加 enable_reminder 列")
+            except Exception as e:
+                print(f"添加 enable_reminder 列失败: {e}")
 
     # ---------- 事件操作 ----------
     def add_event(self, event_data):

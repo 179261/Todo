@@ -39,10 +39,7 @@ class TodoApp:
         self.root.title("待办事项管理器")
         self.root.geometry("800x600")
         # 设置窗口图标
-        try:
-            self.root.iconbitmap("resources/icon.ico")
-        except Exception as e:
-            print(f"窗口图标加载失败: {e}")
+        self.root.iconbitmap("resources/icon.ico")
         # ---- 美化设置 ----
         self.apply_styling()
 
@@ -194,20 +191,17 @@ class TodoApp:
         self.root.after(30000, self.start_reminder_check)
 
     def check_reminders(self):
-        """检查是否有事件开始时间到达"""
         today = datetime.now().strftime("%Y-%m-%d")
         current_time = datetime.now().strftime("%H:%M")
 
-        # 如果日期变更，清空已提醒集合
         if today != self.last_check_date:
             self.notified_events_today.clear()
             self.last_check_date = today
 
-        # 获取今天的所有事件
         events = self.db.get_events_by_date(today)
         for ev in events:
-            # 只检查未完成的事件，并且有开始时间
-            if ev['completed'] == 0 and ev['start_time']:
+            # 只检查未完成、有开始时间、且启用提醒的事件
+            if ev['completed'] == 0 and ev['start_time'] and ev.get('enable_reminder', 1) == 1:
                 if ev['start_time'] == current_time:
                     event_id = ev['id']
                     if event_id not in self.notified_events_today:
@@ -264,5 +258,4 @@ class TodoApp:
 if __name__ == "__main__":
     root = tk.Tk()
     app = TodoApp(root)
-
     root.mainloop()
