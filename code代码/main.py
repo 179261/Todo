@@ -38,7 +38,11 @@ class TodoApp:
         self.root = root
         self.root.title("待办事项管理器")
         self.root.geometry("800x600")
-
+        # 设置窗口图标
+        try:
+            self.root.iconbitmap("resources/icon.ico")
+        except Exception as e:
+            print(f"窗口图标加载失败: {e}")
         # ---- 美化设置 ----
         self.apply_styling()
 
@@ -260,4 +264,5 @@ class TodoApp:
 if __name__ == "__main__":
     root = tk.Tk()
     app = TodoApp(root)
+
     root.mainloop()
